@@ -32,15 +32,22 @@ Make sure to include foreign keys for the relationships that will `CASCADE` upon
 **Answer box:**
 ```sql
 CREATE TABLE forms (
-    --     Add columns here
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT
 );
 
 CREATE TABLE questions (
-    --     Add columns here
+    id SERIAL PRIMARY KEY,
+    form_id INTEGER NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    question_type TEXT NOT NULL
 );
 
 CREATE TABLE question_options (
-    --     Add columns here
+    id SERIAL PRIMARY KEY,
+    question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+    option TEXT NOT NULL
 );
 ```
 
@@ -56,5 +63,10 @@ Using the above schema, write a (Postgres) SQL `SELECT` query to return all ques
 
 **Answer box:**
 ```sql
--- Write query here
+SELECT q.id, q.form_id, q.title, q.question_type, ARRAY_AGG(o.option) AS options
+FROM questions AS q
+LEFT JOIN question_options AS o
+ON q.id = o.question_id
+WHERE q.form_id = 26483
+GROUP BY q.id
 ```
